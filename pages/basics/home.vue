@@ -2,7 +2,11 @@
   <view style="overflow:scroll;height: auto;">
     <!-- 顶部操作条 -->
     <view class="cu-bar bg-white">
-      <view class="action">
+      <!-- 加载 -->
+      <view class="action" v-if="isshowLoad">
+        <view class="cu-load load-cuIcon" :class="!isLoad?'loading':'over'"></view>
+      </view>
+      <view class="action" v-if="isshoename">
         <text class="cuIcon-homefill text-gray"></text> 首页
       </view>
       <view class="content text-bold">
@@ -12,6 +16,8 @@
         <text class="cuIcon-add  text-grey" @click="adddevive"></text>
         <text class="cuIcon-my text-red"></text>
       </view>
+
+
     </view>
     <view>
       <!-- 设置主体内容uin -->
@@ -45,8 +51,8 @@
       <!-- 设备分类 -->
       <view style="margin-top: 20upx;">
         <scroll-view scroll-x class="bg-white nav" scroll-with-animation :scroll-left="scrollLeft">
-          <view class="cu-item" :class="index==TabCur?'text-green cur':''" v-for="(item,index) in devicetype" :key="item.tid" @tap="tabSelect"
-            :data-id="index" :data-tname="item.tname">
+          <view class="cu-item" :class="index==TabCur?'text-green cur':''" v-for="(item,index) in devicetype" :key="item.tid"
+            @tap="tabSelect" :data-id="index" :data-tname="item.tname" :data-tid="item.tid">
             {{item.tname}}
           </view>
         </scroll-view>
@@ -55,19 +61,27 @@
         <view class="cu-bar bg-white solid-bottom" style="margin-top: 10upx;">
           <view class="action">
             <text class="cuIcon-title text-orange "></text> {{devicename}}
+            <view class="cu-capsule radius" style="margin-left: 15upx;margin-top: 5upx;">
+              <view class='cu-tag bg-brown sm'>
+                <text class='cuIcon-likefill'></text>
+              </view>
+              <view class="cu-tag line-brown sm">
+                {{countdevice}}
+              </view>
+            </view>
           </view>
         </view>
         <!-- 设备列表开始 -->
         <view class="cu-list menu-avatar" style="margin-bottom: 130upx;">
-          <view class="cu-item" :class="modalName=='move-box-'+ index?'move-cur':''" v-for="(item,index) in deviceList" :key="index"
-            @touchstart="ListTouchStart" @touchmove="ListTouchMove" @touchend="ListTouchEnd" :data-target="'move-box-' + index">
+          <view class="cu-item" :class="modalName=='move-box-'+ index?'move-cur':''" v-for="(item,index) in deviceList"
+            :key="index" @touchstart="ListTouchStart" @touchmove="ListTouchMove" @touchend="ListTouchEnd" :data-target="'move-box-' + index">
             <view class="cu-avatar round lg" :style="[{backgroundImage:'url(https://ossweb-img.qq.com/images/lol/web201310/skin/big2100'+ (index+2) +'.jpg)'}]"></view>
             <view class="content">
-              <view class="text-grey">11{{item.usernickname}}</view>
+              <view class="text-grey">{{item.usernickname}}</view>
               <view class="text-gray text-sm" @tap="showModal" data-target="DialogModal1" :data-devicenum="item.devicenum">设备编号:{{item.devicenum}}</view>
             </view>
-            <view class="action">
-              <view class='cu-tag bg-red'>报警</view>
+            <view class="action" :style="item.status_name.length === 5 ? 'margin-right:60upx;' : (item.status_name.length === 4 ? 'margin-right:30upx;' : '')" style="margin-top:25upx;">
+              <view :class="item.status_name === '正常'? 'cu-tag bg-green' : 'cu-tag bg-red' ">{{item.status_name}}</view>
             </view>
             <view class="move">
               <view class="bg-grey">查详情</view>
@@ -97,6 +111,7 @@
         </view>
       </view>
     </view>
+    <!-- 加载 -->
   </view>
 </template>
 
@@ -112,13 +127,18 @@
         modalName: null,
         scrollLeft: 0,
         TabCur: 0,
+        isLoad: true,
+        isshowLoad: false,
+        isshoename: true,
         page: 1,
         limit: 10,
         devicename: '工业探测器',
         deviceisusernum: [],
         devicetype: [], // 设备类型
-        deviceList: [],//设备列表
+        deviceList: [], //设备列表
+        countdevice: 0,
         devicenum: '', //复制设备编号
+        tid: '',
         data: [{
           time: '周一',
           tem: 6.9,
@@ -225,11 +245,24 @@
         }
         this.listTouchDirection = null
       },
+      //加载
+      LoadProgress(e) {
+        this.loadProgress = this.loadProgress + 3;
+        if (this.loadProgress < 100) {
+          setTimeout(() => {
+            this.LoadProgress();
+          }, 100)
+        } else {
+          this.loadProgress = 0;
+        }
+      },
       // 设备分类方法
       tabSelect(e) {
         this.TabCur = e.currentTarget.dataset.id;
         this.scrollLeft = (e.currentTarget.dataset.id - 1) * 60
         this.devicename = e.currentTarget.dataset.tname;
+        this.tid = e.currentTarget.dataset.tid;
+        this.devicelist();
       },
       //打开模拟框
       showModal(e) {
@@ -269,12 +302,14 @@
       },
       //获取设备详情信息
       deviceinfo() {
+         this.isshow();
         let opts = {
           url: 'homepagecount/homepagecount',
           method: 'get'
         };
         http.httpRequest(opts).then(res => {
-          this.deviceisusernum = res.data.data
+          this.deviceisusernum = res.data.data;
+          this.isnone();
         }, error => {
           console.log(error);
         })
@@ -282,8 +317,7 @@
       islogin() {
         uni.getStorage({
           key: 'islogin',
-          success: function(res) {
-          },
+          success: function(res) {},
           fail: function(re) {
             uni.redirectTo({
               url: '../login/login',
@@ -293,21 +327,24 @@
       },
       //获取设备详情信息
       devicetypes() {
+        this.isshow();
         let opts = {
           url: 'devices/devicetype',
           method: 'get'
         };
         http.httpRequest(opts).then(res => {
-          this.devicetype = res.data.data.devicetype
+          this.devicetype = res.data.data.devicetype;
+          this.isnone();
         }, error => {
           console.log(error);
         })
       },
       devicelist() {
+        this.isshow();
         let data = {
           page: this.page,
           limit: this.limit,
-          type: ''
+          type: this.tid
         };
         let opts = {
           url: 'devices/devicelist',
@@ -316,9 +353,22 @@
         http.httpRequest(opts, data).then(res => {
           this.deviceList = res.data.data.devicelist;
           this.countdevice = res.data.data.count;
+          this.isnone();
         }, error => {
           console.log(error);
         })
+      },
+      //加载显示
+      isshow() {
+        this.isshoename = false;
+        this.isLoad = false;
+        this.isshowLoad = true;
+      },
+      //加载关闭
+      isnone() {
+        this.isshoename = true;
+        this.isLoad = true;
+        this.isshowLoad = false;
       },
     },
     mounted() {
