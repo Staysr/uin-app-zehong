@@ -6,7 +6,7 @@
         <!-- <text>Amibition</text>   -->
       </view>
       <view class="margin-top-sm">
-        <text>My左</text>
+        <text>{{ username }}</text>
       </view>
       <image src="https://raw.githubusercontent.com/weilanwl/ColorUI/master/demo/images/wave.gif" mode="scaleToFill"
         class="gif-wave"></image>
@@ -16,17 +16,17 @@
     <view class="padding flex text-center text-grey bg-white shadow-warp">
 
       <view class="flex flex-sub flex-direction solid-right" bindtap='toPraise'>
-        <view class="text-xxl text-orange">0</view>
+        <view class="text-xxl text-orange">{{ userdata.devicepolice }}</view>
         <view class="margin-top-sm">
           <text class="cuIcon-attentionfill"></text> 报警数量</view>
       </view>
       <view class="flex flex-sub flex-direction solid-right" bindtap='toAttention'>
-        <view class="text-xxl text-blue">5</view>
+        <view class="text-xxl text-blue">{{ userdata.devicecount }}</view>
         <view class="margin-top-sm">
           <text class="cuIcon-favorfill"></text>设备数量</view>
       </view>
       <view class="flex flex-sub flex-direction" bindtap='toFans'>
-        <view class="text-xxl text-green">0</view>
+        <view class="text-xxl text-green" :style="devicetype > 0 ? 'color:red;' : 'color:green;' ">{{ devicetype < 20 ? '良好' :( devicetype < 50 ? '较差' : (devicetype < 70 ? '极差' : (devicetype < 99 ? '危险' : '正常')) ) }}</view>
         <view class="margin-top-sm">
           <text class="cuIcon-fork"></text>设备分析</view>
       </view>
@@ -77,19 +77,48 @@
 </template>
 
 <script>
+  import http from '@/components/utils/http.js';
   export default {
     data() {
-      return {}
+      return {
+        username: uni.getStorageSync('islogin').name,
+        userdata: [],
+        devicetype: '',
+      }
     },
-    methods: {}
+    methods: {
+      userinfo() {
+        let opts = {
+          url: 'homepagecount/homepagecount',
+          method: 'get'
+        };
+        http.httpRequest(opts).then(res => {
+          this.userdata = res.data.data;
+          this.devicetype = this.devicestatus(res.data.data) ;
+        }, error => {
+          console.log(error);
+        })
+      },
+      // 处理分析
+      devicestatus(data) {
+        var devicecount = data.devicecount; //设备数量
+        var devicepolice = data.devicepolice; // 报警数量
+        devicepolice = parseFloat(devicepolice);
+        devicecount = parseFloat(devicecount);
+        if (isNaN(devicepolice) || isNaN(devicecount)) {
+          return "-";
+        }
+        return devicecount <= 0 ? "0" : (Math.round(devicepolice / devicecount * 10000) / 100.00);
+      },
+    },
+    created() {
+      // 获取信息
+      this.userinfo();
+    },
   }
 </script>
 
 <style>
-  /* pages/my/my.wxss */
-  /* 用户信息 */
-
-
   .UCenter-bg {
     background-image: url(https://image.weilanwl.com/color2.0/index.jpg);
     background-size: cover;

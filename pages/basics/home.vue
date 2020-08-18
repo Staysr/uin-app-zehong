@@ -1,7 +1,7 @@
 <template name="basics">
   <view style="overflow:scroll;height: auto;">
     <!-- 顶部操作条 -->
-    <view class="cu-bar bg-white">
+    <view class="cu-bar bg-white cu-bar fixed nav fixed">
       <!-- 加载 -->
       <view class="action" v-if="isshowLoad">
         <view class="cu-load load-cuIcon" :class="!isLoad?'loading':'over'"></view>
@@ -16,12 +16,10 @@
         <text class="cuIcon-add  text-grey" @click="adddevive"></text>
         <text class="cuIcon-my text-red"></text>
       </view>
-
-
     </view>
     <view>
       <!-- 设置主体内容uin -->
-      <view style="margin-top: 20rpx; background-color: #FFFFFF;height: 230rpx;">
+      <view style="margin-top: 120rpx; background-color: #FFFFFF;height: 230rpx;">
         <!-- 主体内容 -->
         <view class="bg-grey padding-sm radius margin-top-sm  text-sm" style="width: 35%; margin-left: 50rpx;display: inline-block;">
           <view class="flex">
@@ -46,7 +44,12 @@
       </view>
       <!-- 图形表 -->
       <view>
-        <canvas id="myChart" style="width: 100%;height: 400upx;"></canvas>
+        <!--#ifdef MP-ALIPAY -->
+        <canvas style="width: 100%;height: 360upx;" canvas-id="canvasColumnStack" id="canvasColumnStack" @touchstart="touchColumn"></canvas>
+        <!--#endif-->
+        <!--#ifndef MP-ALIPAY -->
+        <canvas style="width: 100%;height: 360upx;"  canvas-id="canvasColumnStack" id="canvasColumnStack" @touchstart="touchColumn"></canvas>
+        <!--#endif-->
       </view>
       <!-- 设备分类 -->
       <view style="margin-top: 20upx;">
@@ -71,22 +74,28 @@
             </view>
           </view>
         </view>
+
         <!-- 设备列表开始 -->
         <view class="cu-list menu-avatar" style="margin-bottom: 130upx;">
           <view class="cu-item" :class="modalName=='move-box-'+ index?'move-cur':''" v-for="(item,index) in deviceList"
             :key="index" @touchstart="ListTouchStart" @touchmove="ListTouchMove" @touchend="ListTouchEnd" :data-target="'move-box-' + index">
-            <view class="cu-avatar round lg" :style="[{backgroundImage:'url(https://ossweb-img.qq.com/images/lol/web201310/skin/big2100'+ (index+2) +'.jpg)'}]"></view>
+            <view class="cu-avatar round lg" :style="item.status_name === '正常' ? icon_device_li_green :  icon_device_li "></view>
             <view class="content">
               <view class="text-grey">{{item.usernickname}}</view>
               <view class="text-gray text-sm" @tap="showModal" data-target="DialogModal1" :data-devicenum="item.devicenum">设备编号:{{item.devicenum}}</view>
             </view>
-            <view class="action" :style="item.status_name.length === 5 ? 'margin-right:60upx;' : (item.status_name.length === 4 ? 'margin-right:30upx;' : '')" style="margin-top:25upx;">
+            <view class="action" :style="item.status_name.length === 5 ? 'margin-right:60upx;' : (item.status_name.length === 4 ? 'margin-right:30upx;' : '')"
+              style="margin-top:25upx;">
               <view :class="item.status_name === '正常'? 'cu-tag bg-green' : 'cu-tag bg-red' ">{{item.status_name}}</view>
             </view>
             <view class="move">
               <view class="bg-grey">查详情</view>
               <view class="bg-red">查记录</view>
             </view>
+          </view>
+          <view class="loadingjiazai" v-if="loadingjiazai || countdevice > 10">
+            <view class="cu-load bg-grey" v-if="overs" :class="!isLoad?'loading':'over'"></view>
+            <view class="cu-load bg-grey" v-if="isover" @click="adddevivelist">点击加载</view>
           </view>
         </view>
         <!-- 模态框 -->
@@ -117,7 +126,8 @@
 
 <script>
   import http from '@/components/utils/http.js';
-  const F2 = require('@antv/f2')
+  import uCharts from '@/components/u-charts/u-charts.js';
+  var canvaColumn = null;
   export default {
     name: "basics",
     data() {
@@ -130,6 +140,11 @@
         isLoad: true,
         isshowLoad: false,
         isshoename: true,
+        loadingjiazai: false,
+        isover: true,
+        overs: false,
+        icon_device_li_green: 'background-image: url(../../static/img/icon_device_li_green.png)',
+        icon_device_li: 'background-image:url(../../static/img/icon_device_li.png)',
         page: 1,
         limit: 10,
         devicename: '工业探测器',
@@ -139,97 +154,15 @@
         countdevice: 0,
         devicenum: '', //复制设备编号
         tid: '',
-        data: [{
-          time: '周一',
-          tem: 6.9,
-          city: '设备数量'
-        }, {
-          time: '周二',
-          tem: 9.5,
-          city: '设备数量'
-        }, {
-          time: '周三',
-          tem: 14.5,
-          city: '设备数量'
-        }, {
-          time: '周四',
-          tem: 18.2,
-          city: '设备数量'
-        }, {
-          time: '周五',
-          tem: 21.5,
-          city: '设备数量'
-        }, {
-          time: '周六',
-          tem: 25.2,
-          city: '设备数量'
-        }, {
-          time: '周日',
-          tem: 26.5,
-          city: '设备数量'
-        }, {
-          time: '周一',
-          tem: -10.8,
-          city: '用户数量'
-        }, {
-          time: '周二',
-          tem: -5.7,
-          city: '用户数量'
-        }, {
-          time: '周三',
-          tem: -11.3,
-          city: '用户数量'
-        }, {
-          time: '周四',
-          tem: -17,
-          city: '用户数量'
-        }, {
-          time: '周五',
-          tem: -22,
-          city: '用户数量'
-        }, {
-          time: '周六',
-          tem: -24.8,
-          city: '用户数量'
-        }, {
-          time: '周日',
-          tem: -24.1,
-          city: '用户数量'
-        }, {
-          time: '周一',
-          tem: 2.6,
-          city: '报警数量'
-        }, {
-          time: '周二',
-          tem: 3.5,
-          city: '报警数量'
-        }, {
-          time: '周三',
-          tem: 8.4,
-          city: '报警数量'
-        }, {
-          time: '周四',
-          tem: 13.5,
-          city: '报警数量'
-        }, {
-          time: '周五',
-          tem: 17,
-          city: '报警数量'
-        }, {
-          time: '周六',
-          tem: -18.6,
-          city: '报警数量'
-        }, {
-          time: '周日',
-          tem: 17.9,
-          city: '报警数量'
-        }]
+        cWidth: '',
+        cHeight: '',
+        pixelRatio: 1,
       };
     },
     methods: {
       // ListTouch触摸开始
       ListTouchStart(e) {
-        this.listTouchStart = e.touches[0].pageX
+        this.listTouchStart = e.touches[0].pageX - 120
       },
       // ListTouch计算方向
       ListTouchMove(e) {
@@ -258,6 +191,9 @@
       },
       // 设备分类方法
       tabSelect(e) {
+        this.page = 1;
+        this.isover = true;
+        this.overs = false;
         this.TabCur = e.currentTarget.dataset.id;
         this.scrollLeft = (e.currentTarget.dataset.id - 1) * 60
         this.devicename = e.currentTarget.dataset.tname;
@@ -269,6 +205,14 @@
         this.modalName = e.currentTarget.dataset.target;
         this.devicenum = e.currentTarget.dataset.devicenum;
       },
+      touchColumn(e) {
+        canvaColumn.touchLegend(e);
+        canvaColumn.showToolTip(e, {
+          format: function(item, category) {
+            return category + ' ' + item.name + ':' + item.data
+          }
+        });
+      },
       //取消模态框
       hideModal(e) {
         this.modalName = null
@@ -276,33 +220,37 @@
       // 跳转添加设备
       adddevive() {
         uni.navigateTo({
-          url: '/pages/adddevice/home',
+          url: '../main/adddevice',
         });
       },
       //复制设备号
       okhideModal() {
-        let ua = window.navigator.userAgent.toLowerCase();
-        if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-          this.hideModal();
-          uni.showToast({
-            title: '当前设备不支持复制',
-            duration: 2000
-          });
-        } else {
-          uni.setClipboardData({
-            data: "2131",
-            success: () => {
-              this.hideModal();
-              uni.showToast({
-                title: '复制成功'
-              })
+        var that = this;
+        uni.getSystemInfo({
+          success: function(res) {
+            if (res.model === undefined) {
+              that.hideModal(),
+                uni.showToast({
+                  title: '当前设备不支持复制',
+                  duration: 2000
+                });
+            } else {
+              uni.setClipboardData({
+                data: this.devicenum,
+                success: () => {
+                  that.hideModal();
+                  uni.showToast({
+                    title: '复制成功'
+                  })
+                }
+              });
             }
-          });
-        }
+          }
+        });
       },
       //获取设备详情信息
       deviceinfo() {
-         this.isshow();
+        this.isshow();
         let opts = {
           url: 'homepagecount/homepagecount',
           method: 'get'
@@ -324,6 +272,37 @@
             });
           }
         });
+      },
+      // 分页加载
+      adddevivelist() {
+        this.isshow();
+        ++this.page;
+        let data = {
+          page: this.page,
+          limit: this.limit,
+          type: this.tid
+        };
+        let opts = {
+          url: 'devices/devicelist',
+          method: 'get'
+        };
+        http.httpRequest(opts, data).then(res => {
+          var isLoadding = res.data.data.devicelist.length >= 1 ? true : false;
+          let arr = res.data.data.devicelist
+          arr.map((val, index, arr) => {
+            this.deviceList.push(val);
+          })
+          if (res.data.data.devicelist.length != 0) {
+            this.isover = true; //点击加载
+            this.overs = false;
+          } else {
+            this.isover = false; //点击加载
+            this.overs = true;
+          }
+          this.isnone();
+        }, error => {
+          console.log(error);
+        })
       },
       //获取设备详情信息
       devicetypes() {
@@ -358,6 +337,43 @@
           console.log(error);
         })
       },
+      showColumnStack(canvasId, chartData) {
+        var that = this;
+        canvaColumn = new uCharts({
+          $this: that,
+          canvasId: canvasId,
+          type: 'column',
+          padding: [180, -19, -60, 347],
+          legend: {
+            show: true,
+            padding: 0,
+            lineHeight:-10,
+            margin: 0,
+          },
+          fontSize: 10,
+          background: '#FFFFFF',
+          pixelRatio: that.pixelRatio,
+          animation: true,
+          categories: chartData.categories,
+          series: chartData.series,
+          xAxis: {
+            disableGrid: true,
+          },
+          yAxis: {
+            //disabled:true
+          },
+          dataLabel: true,
+          width: that.cWidth * that.pixelRatio,
+          height: that.cHeight * that.pixelRatio,
+          extra: {
+            column: {
+              type: 'stack',
+              width: that.cWidth * that.pixelRatio * 0.5 / chartData.categories.length
+            }
+          }
+        });
+
+      },
       //加载显示
       isshow() {
         this.isshoename = false;
@@ -371,17 +387,30 @@
         this.isshowLoad = false;
       },
     },
+    onReachBottom() {
+      console.log("我执行了");
+    },
     mounted() {
-      let el = document.querySelector('#myChart')
-      let canvas = el.querySelector('canvas')
-      let chart = new F2.Chart({
-        el: canvas,
-        id: 'container',
-        pixelRatio: window.devicePixelRatio
-      })
-      chart.source(this.data)
-      chart.interval().position('time*tem').color('city')
-      chart.render()
+      let that = this;
+      uni.request({
+        url: 'https://www.ucharts.cn/data.json',
+        data: {},
+        success: function(res) {
+          console.log(res.data.data)
+          let ColumnStack = {
+            categories: [],
+            series: []
+          };
+          //这里我后台返回的是数组，所以用等于，如果您后台返回的是单条数据，需要push进去
+          ColumnStack.categories = res.data.data.ColumnStack.categories;
+          ColumnStack.series = res.data.data.ColumnStack.series;
+          // _self.textarea = JSON.stringify(res.data.data.ColumnStack);
+          that.showColumnStack("canvasColumnStack", ColumnStack);
+        },
+        fail: () => {
+          //that.tips = "网络错误，小程序端请检查合法域名";
+        },
+      });
     },
     created() {
       // 监测登入状态
@@ -397,7 +426,20 @@
 </script>
 
 <style>
-  .page {
-    height: 100vh;
+  .qiun-charts {
+    width: 750upx;
+    height: 500upx;
+  }
+
+  .loadingjiazai {
+    margin-top: 20rpx;
+    filter: alpha(Opacity=60);
+    -moz-opacity: 0.6;
+    opacity: 0.6;
+  }
+
+  .charts {
+    width: 750upx;
+    height: 500upx;
   }
 </style>
