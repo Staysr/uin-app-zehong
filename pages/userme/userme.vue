@@ -6,7 +6,7 @@
         <!-- <text>Amibition</text>   -->
       </view>
       <view class="margin-top-sm">
-        <text>{{ username }}</text>
+        <text  class="radius text-center shadow-blur bg-black" >{{ username }}</text>
       </view>
       <image src="https://raw.githubusercontent.com/weilanwl/ColorUI/master/demo/images/wave.gif" mode="scaleToFill"
         class="gif-wave"></image>
@@ -120,7 +120,7 @@
 
 <style>
   .UCenter-bg {
-    background-image: url(https://image.weilanwl.com/color2.0/index.jpg);
+    background-image: url(../../static/zaizai-login/userbage.png);
     background-size: cover;
     height: 450rpx;
     display: flex;

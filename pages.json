@@ -26,7 +26,11 @@
 				"navigationBarTitleText": "我的"
 			}
 		},{
-			"path": "pages/adddevice/home",
+			"path": "pages/basics/deviceinfo",
+			"style": {
+			}
+		},{
+			"path": "pages/basics/devicerecording",
 			"style": {
 			}
 		}

@@ -48,7 +48,7 @@
         <canvas style="width: 100%;height: 360upx;" canvas-id="canvasColumnStack" id="canvasColumnStack" @touchstart="touchColumn"></canvas>
         <!--#endif-->
         <!--#ifndef MP-ALIPAY -->
-        <canvas style="width: 100%;height: 360upx;"  canvas-id="canvasColumnStack" id="canvasColumnStack" @touchstart="touchColumn"></canvas>
+        <canvas style="width: 100%;height: 360upx;" canvas-id="canvasColumnStack" id="canvasColumnStack" @touchstart="touchColumn"></canvas>
         <!--#endif-->
       </view>
       <!-- 设备分类 -->
@@ -89,8 +89,8 @@
               <view :class="item.status_name === '正常'? 'cu-tag bg-green' : 'cu-tag bg-red' ">{{item.status_name}}</view>
             </view>
             <view class="move">
-              <view class="bg-grey">查详情</view>
-              <view class="bg-red">查记录</view>
+              <view class="bg-grey" @click="devicedatainfo(item.id)">查详情</view>
+              <view class="bg-red" @click="devicerecording(item.devicenum)">查记录</view>
             </view>
           </view>
           <view class="loadingjiazai" v-if="loadingjiazai || countdevice > 10">
@@ -223,6 +223,57 @@
           url: '../main/adddevice',
         });
       },
+      //获取设备详情
+      devicedatainfo(id) {
+        this.isshow();
+        let opts = {
+          url: 'huinapphome/devicedatainfo/' + id,
+          method: 'get'
+        };
+        http.httpRequest(opts).then(res => {
+          if (res.data.code === 200) {
+            uni.navigateTo({
+              url: '/pages/basics/deviceinfo?data=' + JSON.stringify(res.data.data),
+            });
+          }
+          this.isnone();
+        }, error => {
+          console.log(error);
+        })
+      },
+      devicerecording(id) {
+        this.isshow();
+        let data = {
+          currentPage: 1,
+          deviceNum: id,
+          deviceStatus: 0,
+          pageSize: 1,
+          timeRange: '',
+          total: 1,
+        };
+        let opts = {
+          url: 'devices/detedevice',
+          method: 'post'
+        };
+        http.httpRequest(opts, data).then(res => {
+          if (res.data.data.total > 0) {
+            if (res.data.code === 200) {
+              uni.navigateTo({
+                url: '/pages/basics/devicerecording?data=' + JSON.stringify(res.data.data),
+              });
+            }
+          } else {
+            uni.showToast({
+              icon: 'none',
+              title: '暂无记录',
+              duration: 2000
+            });
+          }
+          this.isnone();
+        }, error => {
+          console.log(error);
+        })
+      },
       //复制设备号
       okhideModal() {
         var that = this;
@@ -347,7 +398,7 @@
           legend: {
             show: true,
             padding: 0,
-            lineHeight:-10,
+            lineHeight: -10,
             margin: 0,
           },
           fontSize: 10,

@@ -1,7 +1,7 @@
 <template>
   <view class="zai-box" @touchmove.prevent>
-    <image src="../../static/zaizai-login/login.png" mode='aspectFit' class="zai-logo"></image>
-    <view class="zai-title">LOGO区域</view>
+    <image src="../../static/zaizai-login/login.png"  class="zai-logo"></image>
+    <!-- <view class="zai-title">LOGO区域</view> -->
     <form @submit="formSubmit">
       <view class="zai-form">
         <input class="zai-input" placeholder="请输入用户名" name="email" />
@@ -102,14 +102,14 @@
 
 <style>
   .zai-box {
-    padding: 0 100upx;
-    position: relative;
+    /* padding: 0  0 100upx; */
+    /* position: relative; */
   }
 
   .zai-logo {
     width: 100%;
-    height: 310upx;
-    margin-top: 174upx;
+    height: 580upx;
+    /* margin-top: 174upx; */
   }
 
   .zai-title {
@@ -134,6 +134,7 @@
     padding: 20upx 40upx;
     font-size: 36upx;
     height: 150upx;
+    margin-left: 30upx;
   }
 
   .input-placeholder,
@@ -154,6 +155,7 @@
     border: 0;
     border-radius: 100upx;
     font-size: 36upx;
+    width: 90%;
   }
 
   .zai-btn:after {
@@ -167,5 +169,6 @@
   .loading-white {
     position: fixed;
     top: 25%;
+    left: 50upx;
   }
 </style>
