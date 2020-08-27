@@ -1,93 +1,42 @@
 <template name="components">
-	<view>
-    我是设备状态
-		<!-- <scroll-view scroll-y class="page">
-			<image src="/static/componentBg.png" mode="widthFix" class="response"></image>
-			<view class="nav-list">
-				<navigator hover-class='none' :url="'/pages/component/' + item.name" class="nav-li" navigateTo :class="'bg-'+item.color"
-				 :style="[{animation: 'show ' + ((index+1)*0.2+1) + 's 1'}]" v-for="(item,index) in elements" :key="index">
-					<view class="nav-title">{{item.title}}</view>
-					<view class="nav-name">{{item.name}}</view>
-					<text :class="'cuIcon-' + item.cuIcon"></text>
-				</navigator>
-			</view>
-			<view class="cu-tabbar-height"></view>
-		</scroll-view> -->
-	</view>
+  <view>
+    <cu-custom bgColor="bg-gradual-blue" :isBack="false">>
+      <block slot="content">设备记录</block>
+    </cu-custom>
+    <view class="cu-bar bg-white  solid-bottom">
+      <view class="action">
+        <text class="cuIcon-title text-orange"></text>{{ tagname }}
+      </view>
+    </view>
+    <scroll-view scroll-x class="bg-white nav text-center">
+      <view class="cu-item" :class="index==TabCur?'text-blue cur':''" v-for="(item,index) in tagdata" :key="index" @tap="tabSelect"
+        :data-id="index" :data-tagname="item">
+        {{item}}
+      </view>
+    </scroll-view>
+  </view>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				elements: [{
-						title: '操作条',
-						name: 'bar',
-						color: 'purple',
-						cuIcon: 'vipcard'
-					},
-					{
-						title: '导航栏 ',
-						name: 'nav',
-						color: 'mauve',
-						cuIcon: 'formfill'
-					},
-					{
-						title: '列表',
-						name: 'list',
-						color: 'pink',
-						cuIcon: 'list'
-					},
-					{
-						title: '卡片',
-						name: 'card',
-						color: 'brown',
-						cuIcon: 'newsfill'
-					},
-					{
-						title: '表单',
-						name: 'form',
-						color: 'red',
-						cuIcon: 'formfill'
-					},
-					{
-						title: '时间轴',
-						name: 'timeline',
-						color: 'orange',
-						cuIcon: 'timefill'
-					},
-					{
-						title: '聊天',
-						name: 'chat',
-						color: 'green',
-						cuIcon: 'messagefill'
-					},
-					{
-						title: '轮播',
-						name: 'swiper',
-						color: 'olive',
-						cuIcon: 'album'
-					},
-					{
-						title: '模态框',
-						name: 'modal',
-						color: 'grey',
-						cuIcon: 'squarecheckfill'
-					},
-					{
-						title: '步骤条',
-						name: 'steps',
-						color: 'cyan',
-						cuIcon: 'roundcheckfill'
-					}
-				],
-			};
-		}
-	}
+  export default {
+    data() {
+      return {
+        TabCur: 0,
+        tagdata: ['危化监测','消防监测'],
+        tagname: '危化监测',
+      };
+    },
+    methods: {
+      tabSelect(e) {
+        this.TabCur = e.currentTarget.dataset.id;
+        this.tagname = e.currentTarget.dataset.tagname;
+      }
+    },
+    created() {
+      // this.
+    },
+  }
 </script>
 
 <style>
-	.page {
-		height: 100vh;
-	}
 </style>

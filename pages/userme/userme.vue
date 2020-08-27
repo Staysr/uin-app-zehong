@@ -6,10 +6,10 @@
         <!-- <text>Amibition</text>   -->
       </view>
       <view class="margin-top-sm">
-        <text  class="radius text-center shadow-blur bg-black" >{{ username }}</text>
+        <text class="radius text-center shadow-blur bg-black">{{ username }}</text>
       </view>
-      <image src="https://raw.githubusercontent.com/weilanwl/ColorUI/master/demo/images/wave.gif" mode="scaleToFill"
-        class="gif-wave"></image>
+      <!-- <image src="https://raw.githubusercontent.com/weilanwl/ColorUI/master/demo/images/wave.gif" mode="scaleToFill"
+        class="gif-wave"></image> -->
     </view>
     <!-- 用户信息end -->
 
@@ -37,35 +37,33 @@
     <!-- 设置详细 -->
     <view class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg radius">
       <view class="cu-item arrow">
-        <view class="content" @tap="toIssue_page">
+        <navigator class="content" hover-class="none" url='/pages/userme/userpolice'>
           <text class="cuIcon-moneybagfill text-red"></text>
-          <text class="text-grey">报警设备</text>
-          <text class='num'>19</text>
-        </view>
+          <text class="text-grey">报警记录</text>
+          <!-- <text class='num'>19</text> -->
+        </navigator>
       </view>
 
-      <view class="cu-item arrow">
+      <!-- <view class="cu-item arrow">
         <navigator class="content" hover-class="none" url='/pages/my/my_sale/my_sale'>
           <text class="cuIcon-titles text-green"></text>
           <text class="text-grey">我的设备</text>
-          <text class='num'>99</text>
         </navigator>
       </view>
       <view class="cu-item arrow">
         <navigator class="content" hover-class="none" url="/pages/my/my_buy/my_buy">
           <text class="cuIcon-formfill text-green"></text>
           <text class="text-grey">用户设备</text>
-          <text class='num'>1</text>
         </navigator>
-      </view>
+      </view> -->
       <view class="cu-item arrow">
-        <view class="content" bindtap="CopyLink" data-link="https://github.com/weilanwl/ColorUI">
+        <navigator class="content" hover-class="none" url="/pages/userme/userlist">
           <text class="cuIcon-locationfill text-grey"></text>
           <text class="text-grey">用户列表</text>
-        </view>
+        </navigator>
       </view>
-      <view class="cu-item arrow">
-        <view class="content" bindtap="toCollect">
+      <view class="cu-item">
+        <view class="content" bindtap="toCollect" @click="service">
           <text class="cuIcon-appreciatefill text-red"></text>
           <text class="text-grey">客服</text>
         </view>
@@ -94,7 +92,7 @@
         };
         http.httpRequest(opts).then(res => {
           this.userdata = res.data.data;
-          this.devicetype = this.devicestatus(res.data.data) ;
+          this.devicetype = this.devicestatus(res.data.data);
         }, error => {
           console.log(error);
         })
@@ -110,6 +108,8 @@
         }
         return devicecount <= 0 ? "0" : (Math.round(devicepolice / devicecount * 10000) / 100.00);
       },
+      //客服
+      service() {}
     },
     created() {
       // 获取信息

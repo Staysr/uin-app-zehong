@@ -5,7 +5,7 @@
       <block slot="content">设备记录</block>
     </cu-custom>
     <view>
-      <view class="cu-timeline" v-for="(item,index) in devicedata">
+      <view class="cu-timeline" v-for="(item,index) in devicedata" :key="index">
         <view class="cu-item">
           <view class="content">
             <view class="cu-capsule radius">
@@ -22,6 +22,12 @@
         </view>
       </view>
     </view>
+    <!-- 返回首页 -->
+    <view v-if="ishome">
+      <view @click="hoishome">
+        <image class="ishome" src="../../static/ishome.png"></image>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -31,10 +37,14 @@
     data() {
       return {
         devicedata: [],
+        ishome: false,
       }
     },
     methods: {
       deviceinfo(total, device_num) {
+        uni.showLoading({
+          title: '加载数据中...'
+        });
         let data = {
           currentPage: 1,
           deviceNum: device_num,
@@ -49,9 +59,15 @@
         };
         http.httpRequest(opts, data).then(res => {
           this.devicedata = res.data.data.list
+          uni.hideLoading();
         }, error => {
           console.log(error);
         })
+      },
+      hoishome() {
+        uni.reLaunch({
+          url: '../main/main',
+        });
       },
     },
     filters: {
@@ -59,7 +75,7 @@
         if (!str) return '';
         var result;
         var reg = /[a-zA-Z]+/;
-        while (result = str.match(reg)) { 
+        while (result = str.match(reg)) {
           str = str.replace(result[0], ' ');
         }
         return str;
@@ -68,9 +84,23 @@
     onLoad(e) {
       var data = JSON.parse(e.data);
       this.deviceinfo(data.total, data.list[0].device_num);
-    }
+    },
+    onShow() {
+      let pages = getCurrentPages(); //当前页面栈
+      if (pages.length >= 4) {
+        this.ishome = true;
+      }
+    },
   }
 </script>
 
 <style>
+  .ishome{
+    width: 90upx;
+    height: 90upx;
+    position:fixed;
+    z-index: 99999;
+    left: 640upx;
+    bottom: 200upx;
+  }
 </style>

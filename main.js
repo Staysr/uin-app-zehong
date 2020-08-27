@@ -6,14 +6,14 @@ Vue.component('basics',basics)
 import components from './pages/component/home.vue'
 Vue.component('components',components)
 
-import plugin from './pages/plugin/home.vue'
-Vue.component('plugin',plugin)
-
 import adddevice from './pages/adddevice/home.vue'
 Vue.component('adddevice',adddevice)
 
 import userme from './pages/userme/userme.vue'
 Vue.component('userme',userme)
+
+import search from './pages/search/home.vue'
+Vue.component('search',search)
 
 import cuCustom from './colorui/components/cu-custom.vue'
 Vue.component('cu-custom',cuCustom)
