@@ -29,6 +29,10 @@
       "style": {
         "enablePullDownRefresh": true
       }
+    }, {
+      "path": "pages/adddevice/mpnaddlink",
+      "style": {
+      }
     }
   ],
   // "tabBar": {

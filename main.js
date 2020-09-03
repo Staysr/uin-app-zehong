@@ -18,6 +18,9 @@ Vue.component('search',search)
 import cuCustom from './colorui/components/cu-custom.vue'
 Vue.component('cu-custom',cuCustom)
 
+import VueJsonp from 'vue-jsonp'
+Vue.use(VueJsonp)
+
 Vue.config.productionTip = false
 App.mpType = 'app'
 

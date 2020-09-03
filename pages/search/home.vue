@@ -8,16 +8,18 @@
         <text class="cuIcon-title text-green"></text>
         <text>搜索设备</text>
       </view>
-      <view class="action">
+      <view class="action" v-if="showpahk" @click="deletedevice">
         <text class="cuIcon-deletefill text-gray"></text>清空历史
       </view>
     </view>
     <view class="cu-bar search bg-white margin-top">
       <view class="search-form round">
         <text class="cuIcon-search"></text>
-        <input @focus="InputFocus" @blur="InputBlur" @input="devicedata" :adjust-position="false" type="text"
-          placeholder="搜索设备号、名称" confirm-type="search"></input>
+        <text class="cuIcon-close" v-if="cuIconde" style="position: absolute;left:500upx;z-index: 99999;" @click="nonecuIconde"></text>
+        <input @focus="InputFocus" :value="searchdata" @blur="InputBlur" @input="devicedata" :adjust-position="false" type="text"
+          :placeholder="devicedatasetshow === '' ? '搜索设备号、名称 ' : devicedatasetshow " confirm-type="search"></input>
       </view>
+      <!-- 搜索设备号、名称 -->
       <view class="action">
         <button class="cu-btn bg-green shadow-blur round" @click="postseachdata">搜索</button>
       </view>
@@ -35,9 +37,10 @@
         </view>
       </view>
     </view>
-    <!-- <view class="history">
-      <view class="cu-tag bg-grey" style="margin-top: 20upx;margin-left: 12upx;" v-for="(item,index) in 30" :key="index">324324</view>
-    </view> -->
+    <view class="history" v-if="showpahk">
+      <view class="cu-tag bg-grey" style="margin-top: 20upx;margin-left: 12upx;" v-for="(item,index) in showdevicedata"
+        :key="index" @click="postseachdataset(item)">{{ item }}</view>
+    </view>
   </view>
 </template>
 
@@ -48,7 +51,12 @@
       return {
         InputBottom: 0,
         searchdata: '',
+        setsearchdata: '',
         seardevicedata: [],
+        cuIconde: false,
+        showpahk: false,
+        devicedatasetshow: '',
+        showdevicedata: '',
         icon_device_li_green: 'background-image: url(../../static/img/icon_device_li_green.png)',
         icon_device_li: 'background-image:url(../../static/img/icon_device_li.png)',
       };
@@ -64,6 +72,8 @@
       devicedata(e) {
         this.searchdata = e.detail.value;
         this.imitation();
+        //监听搜索框空值
+        this.isinputnull();
       },
       //请求搜索
       postseachdata() {
@@ -75,28 +85,56 @@
           setseachdata: this.searchdata,
         };
         http.httpRequest(opts, data).then(res => {
-          if(res.data.data.length >= 1){
-            this.seardevicedata = res.data.data
+          if (res.data.data.length > 0) {
+            this.seardevicedata = res.data.data;
+            this.noewpa();
+          } else {
+            uni.showToast({
+              title: '暂无数据',
+              duration: 2000
+            });
+            let that = this;
+            setTimeout(function() {
+              that.seardevicedata = [];
+              that.isinputnull();
+              that.searchdata = '';
+            }, 2000)
           }
+          this.setseachdata();
+          this.chatshowsetdevice();
         }, error => {
           console.log(error);
         })
-        // this.setseachdata();
       },
       //缓存搜索历史
       setseachdata() {
         const value = uni.getStorageSync('setseachdata');
         if (value === undefined || value === '') {
-          uni.setStorageSync('setseachdata', this.searchdata);
+          uni.setStorageSync('setseachdata', this.searchdata.split(','));
         } else {
-          // arr.map((val, index, value) => {
-          //   this.deviceList.push(val);
-          // })
+          if (value.length <= 30) {
+            this.setsearchdata = value;
+            if (this.searchdata != '') {
+              this.setsearchdata.push(this.searchdata);
+              uni.setStorageSync('setseachdata', this.setsearchdata);
+            }
+          }
         }
-        uni.setStorageSync('setseachdata', []);
+      },
+      //获取缓存搜索
+      chatshowsetdevice() {
+        this.showdevicedata = uni.getStorageSync('setseachdata');
+      },
+      // 显示隐藏框
+      shownoew() {
+        this.showpahk = true;
+      },
+      noewpa() {
+        this.showpahk = false;
       },
       //模糊列表
       imitation() {
+        this.devicedatasetshow = '';
         let opts = {
           url: 'huinapphome/imitation',
           method: 'post'
@@ -105,15 +143,19 @@
           imitationdata: this.searchdata,
         };
         http.httpRequest(opts, data).then(res => {
-          if(res.data.data.length >= 1){
-            this.seardevicedata = res.data.data
+          if (res.data.data.length > 0) {
+            this.seardevicedata = res.data.data;
+            this.noewpa();
+          } else {
+            this.seardevicedata = [];
+            this.isinputnull();
           }
         }, error => {
           console.log(error);
         })
       },
       //跳转设备详情
-      devicceinfo(id){
+      devicceinfo(id) {
         let opts = {
           url: 'huinapphome/devicedatainfo/' + id,
           method: 'get'
@@ -127,8 +169,66 @@
         }, error => {
           console.log(error);
         })
+      },
+      //删除搜索历史记录
+      deletedevice() {
+        uni.removeStorageSync('setseachdata');
+        this.noewpa();
+      },
+      postseachdataset(devicedataset) {
+        this.cuIconde = true;
+        let opts = {
+          url: 'huinapphome/imitation',
+          method: 'post'
+        };
+        let data = {
+          imitationdata: devicedataset,
+        };
+        this.searchdata = devicedataset,
+          http.httpRequest(opts, data).then(res => {
+            if (res.data.data.length > 0) {
+              this.seardevicedata = res.data.data;
+              this.noewpa();
+            } else {
+              uni.showToast({
+                title: '暂无数据',
+                duration: 2000
+              });
+              let that = this;
+              setTimeout(function() {
+                that.seardevicedata = [];
+                that.isinputnull();
+                that.searchdata = '';
+                that.cuIconde = false;
+              }, 2000)
+            }
+          }, error => {
+            console.log(error);
+          })
+      },
+      //监听搜索框空值
+      isinputnull() {
+        if (this.searchdata === '') {
+          this.chatshowsetdevice();
+          this.shownoew();
+          this.seardevicedata = [];
+        }
+      },
+      //删除
+      nonecuIconde() {
+        this.cuIconde = false;
+        this.searchdata = '';
+        this.seardevicedata = [];
+        this.isinputnull();
+      },
+    },
+    created() {
+      this.seardevicedata = [];
+      this.chatshowsetdevice();
+      if (uni.getStorageSync('setseachdata').length > 0) {
+        this.shownoew();
       }
-    }
+    },
   }
 </script>
 

@@ -1,6 +1,6 @@
 <template>
   <view class="zai-box" @touchmove.prevent>
-    <image src="../../static/zaizai-login/login.png"  class="zai-logo"></image>
+    <image src="../../static/zaizai-login/login.png" class="zai-logo"></image>
     <!-- <view class="zai-title">LOGO区域</view> -->
     <form @submit="formSubmit">
       <view class="zai-form">
@@ -27,6 +27,7 @@
     },
     methods: {
       formSubmit(e) {
+        let that = this;
         var email = e.detail.value.email;
         var password = e.detail.value.password;
         if (email === '' || password === '') {
@@ -44,7 +45,7 @@
             email: email,
             password: password
           };
-          this.loadingwhite = true;
+          that.loadingwhite = true;
           http.httpTokenRequest(opts, param).then(res => {
             if (res.data.success === undefined) {
               uni.setStorage({
@@ -55,8 +56,8 @@
                     key: 'islogin',
                     data: res.data,
                     success: function() {
-                      this.loadingwhite = false
-                      uni.navigateTo({
+                      that.loadingwhite = false
+                      uni.reLaunch({
                         url: '../main/main',
                       });
                     }
@@ -77,26 +78,42 @@
         }
       },
       //监测登录
-      islogin() {
-        uni.getStorage({
-          key: 'islogin',
-          success: function(res) {
-            uni.redirectTo({
-              url: '../main/main',
-            });
-          },
-          fail: function(re) {
-            uni.redirectTo({
-              url: '../login/login',
-            });
-          }
-        });
+      islogin(type) {
+        if (type) {
+          uni.reLaunch({
+            url: '../login/login',
+          });
+        } else {
+          uni.reLaunch({
+            url: '../main/main',
+          });
+        }
+ // uni.getStorage({
+ //          key: 'islogin',
+ //          success: function(res) {
+
+ //          },
+ //          fail: function(re) {
+
+ //          }
+ //        });
+      },
+      showislogin() {
+        let that = this;
+        var loginis = uni.getStorageSync('Authorization');
+        if (loginis === '' || loginis === undefined) {
+          that.islogin(true);
+        } else {
+          that.islogin(false);
+        }
       },
     },
-    mounted() {
+    mounted() {},
+    onLoad() {
+      let that = this;
       // 监测登入
-      this.islogin();
-    },
+      that.showislogin();
+    }
   }
 </script>
 
@@ -166,6 +183,7 @@
   .zai-btn.button-hover {
     transform: translate(1upx, 1upx);
   }
+
   .loading-white {
     position: fixed;
     top: 25%;

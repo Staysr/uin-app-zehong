@@ -44,12 +44,14 @@
       </view>
       <!-- 图形表 -->
       <view>
-        <!--#ifdef MP-ALIPAY -->
-        <canvas style="width: 100%;height: 360upx;" canvas-id="canvasColumnStack" id="canvasColumnStack" @touchstart="touchColumn"></canvas>
-        <!--#endif-->
-        <!--#ifndef MP-ALIPAY -->
-        <canvas style="width: 100%;height: 360upx;" canvas-id="canvasColumnStack" id="canvasColumnStack" @touchstart="touchColumn"></canvas>
-        <!--#endif-->
+        <view class="qiun-charts">
+          <!--#ifdef MP-ALIPAY -->
+          <canvas canvas-id="canvasColumn" id="canvasColumn" class="charts" :style="{'width':cWidth*pixelRatio+'px','height':cHeight*pixelRatio+'px', 'transform': 'scale('+(1/pixelRatio)+')','margin-left':-cWidth*(pixelRatio-1)/2+'px','margin-top':-cHeight*(pixelRatio-1)/2+'px'}"></canvas>
+          <!--#endif-->
+          <!--#ifndef MP-ALIPAY -->
+          <canvas canvas-id="canvasColumn" id="canvasColumn" class="charts"></canvas>
+          <!--#endif-->
+        </view>
       </view>
       <!-- 设备分类 -->
       <view style="margin-top: 20upx;">
@@ -128,6 +130,7 @@
   import http from '@/components/utils/http.js';
   import uCharts from '@/components/u-charts/u-charts.js';
   var canvaColumn = null;
+  var _self;
   export default {
     name: "basics",
     data() {
@@ -154,9 +157,11 @@
         countdevice: 0,
         devicenum: '', //复制设备编号
         tid: '',
+        // 统计图
         cWidth: '',
         cHeight: '',
         pixelRatio: 1,
+        serverData: ''
       };
     },
     methods: {
@@ -355,6 +360,24 @@
           console.log(error);
         })
       },
+      //监测是否是app
+      isapp() {
+        _self = this;
+        //#ifdef MP-ALIPAY
+        uni.getSystemInfo({
+          success: function(res) {
+            if (res.pixelRatio > 1) {
+              //正常这里给2就行，如果pixelRatio=3性能会降低一点
+              //_self.pixelRatio =res.pixelRatio;
+              _self.pixelRatio = 2;
+            }
+          }
+        });
+        //#endif
+        this.cWidth = uni.upx2px(750);
+        this.cHeight = uni.upx2px(500);
+        this.getServerData();
+      },
       //获取设备详情信息
       devicetypes() {
         this.isshow();
@@ -388,42 +411,38 @@
           console.log(error);
         })
       },
-      showColumnStack(canvasId, chartData) {
-        var that = this;
+      showColumn(canvasId, chartData) {
         canvaColumn = new uCharts({
-          $this: that,
+          $this: _self,
           canvasId: canvasId,
           type: 'column',
-          padding: [180, -19, -60, 347],
-          legend: {
-            show: true,
-            padding: 0,
-            lineHeight: -10,
-            margin: 0,
-          },
-          fontSize: 10,
+          legend: true,
+          fontSize: 11,
           background: '#FFFFFF',
-          pixelRatio: that.pixelRatio,
+          pixelRatio: _self.pixelRatio,
           animation: true,
           categories: chartData.categories,
           series: chartData.series,
           xAxis: {
             disableGrid: true,
           },
-          yAxis: {
-            //disabled:true
-          },
+          yAxis: {},
           dataLabel: true,
-          width: that.cWidth * that.pixelRatio,
-          height: that.cHeight * that.pixelRatio,
+          width: _self.cWidth * _self.pixelRatio,
+          height: _self.cHeight * _self.pixelRatio,
           extra: {
             column: {
-              type: 'stack',
-              width: that.cWidth * that.pixelRatio * 0.5 / chartData.categories.length
+              type:'group',
+              width: _self.cWidth * _self.pixelRatio * 0.45 / chartData.categories.length
             }
           }
         });
-
+      },
+      changeData() {
+        canvaColumn.updateData({
+          series: _self.serverData.ColumnB.series,
+          categories: _self.serverData.ColumnB.categories
+        });
       },
       //加载显示
       isshow() {
@@ -437,38 +456,84 @@
         this.isLoad = true;
         this.isshowLoad = false;
       },
+
+      // 统计图
+
+      getServerData() {
+        const xData = (function() {
+          const data = [];
+          const date = new Date();
+          for (let i = 1; i < date.getMonth() + 1 + 1; i++) {
+            data.push(i + '月');
+          }
+          return data;
+        }());
+        let opts = {
+          url: 'homepagecount/devicemonthcount',
+          method: 'get'
+        };
+        http.httpRequest(opts).then(res => {
+          _self.serverData = res.data.data;
+          let Column = {
+            categories: xData,
+            series: [{
+              name: '设备数量',
+              type: 'column',
+              smooth: true,
+              symbol: 'circle',
+              symbolSize: 5,
+              showSymbol: false,
+              lineStyle: {
+                normal: {
+                  width: 1,
+                },
+              },
+              data: res.data.data.devicedata,
+            }, {
+              name: '用户数量',
+              type: 'column',
+              smooth: true,
+              symbol: 'circle',
+              symbolSize: 5,
+              showSymbol: false,
+              lineStyle: {
+                normal: {
+                  width: 1,
+                },
+              },
+              data:res.data.data.policedata
+            }, {
+              name: '报警数量',
+              type: 'column',
+              smooth: true,
+              symbol: 'circle',
+              symbolSize: 5,
+              showSymbol: false,
+              lineStyle: {
+                normal: {
+                  width: 1,
+                },
+              },
+              data: res.data.data.devicepolice,
+            }]
+          };
+          _self.showColumn("canvasColumn", Column);
+        }, error => {
+          console.log(error);
+        })
+      },
     },
     onReachBottom() {
       console.log("我执行了");
     },
-    mounted() {
-      let that = this;
-      uni.request({
-        url: 'https://www.ucharts.cn/data.json',
-        data: {},
-        success: function(res) {
-          console.log(res.data.data)
-          let ColumnStack = {
-            categories: [],
-            series: []
-          };
-          //这里我后台返回的是数组，所以用等于，如果您后台返回的是单条数据，需要push进去
-          ColumnStack.categories = res.data.data.ColumnStack.categories;
-          ColumnStack.series = res.data.data.ColumnStack.series;
-          // _self.textarea = JSON.stringify(res.data.data.ColumnStack);
-          that.showColumnStack("canvasColumnStack", ColumnStack);
-        },
-        fail: () => {
-          //that.tips = "网络错误，小程序端请检查合法域名";
-        },
-      });
-    },
+    mounted() {},
     created() {
       // 监测登入状态
       this.deviceinfo();
       this.islogin();
       this.devicetypes();
       this.devicelist();
+      this.isapp();
     },
     onLaunch() {
       console.log("success")
@@ -479,7 +544,8 @@
 <style>
   .qiun-charts {
     width: 750upx;
-    height: 500upx;
+    height: 470upx;
+    margin-top: 20upx;
   }
 
   .loadingjiazai {
