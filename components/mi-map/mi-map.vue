@@ -4,7 +4,7 @@
       :controls='controls' @regionchange='mapChange'>
     </map>
     <view class="map-tools">
-     <button style="top:-800upx;left: 300upx;" class="cu-btn round bg-grey shadow" @click="onnone">取消</button>
+     <button style="top:-780upx;left: 300upx;" class="cu-btn round bg-grey shadow" @click="onnone">取消</button>
      <!-- 点击这个取消怎么触发引用的方法 -->
       <view class="my-location" @tap="toMyLocation">
         <image class="left" src="../../static/jjdd.png" mode=""></image>
@@ -31,7 +31,7 @@
   const app = getApp()
   var QQMapWX = require('./qqmap-wx-jssdk.min.js')
   var qqmapsdk = new QQMapWX({
-    key: 'LXCBZ-NNIKD-UZ64F-H6AFI-UNJLH-OCFGE'
+    key: 'SJBBZ-LNVKU-5IUVR-2FGDI-CB7ZS-U7FFV'
   })
   export default {
     props: {
@@ -158,7 +158,7 @@
 
           // #ifndef APP-PLUS
           // ======================== jsonp跨域 ======================== 
-          const KEY = 'LXCBZ-NNIKD-UZ64F-H6AFI-UNJLH-OCFGE'
+          const KEY = 'SJBBZ-LNVKU-5IUVR-2FGDI-CB7ZS-U7FFV'
           let locationObj = addressObj.latitude + ',' + addressObj.longitude
           let url =
             'https://apis.map.qq.com/ws/geocoder/v1?coord_type=5&get_poi=1&output=jsonp&poi_options=page_size=1;page_index=1';

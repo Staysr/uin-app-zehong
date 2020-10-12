@@ -30,9 +30,19 @@
         "enablePullDownRefresh": true
       }
     }, {
-      "path": "pages/adddevice/mpnaddlink",
+      "path": "pages/userme/setup",
+      "style": {}
+    }, {
+      "path": "pages/userme/infozehong",
+      "style": {}
+    }, {
+      "path": "pages/adddevice/latitude",
       "style": {
+        "navigationBarTitleText": "经纬度"
       }
+    }, {
+      "path": "pages/adddevice/mpnaddlink",
+      "style": {}
     }
   ],
   // "tabBar": {

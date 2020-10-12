@@ -11,7 +11,13 @@
         "compilerVersion" : 3,
         /* 模块配置 */
         "modules" : {
-            "Speech" : {}
+            "Speech" : {},
+            "Share" : {},
+            "Bluetooth" : {},
+            "Push" : {},
+            "LivePusher" : {},
+            "Maps" : {},
+            "FaceID" : {}
         },
         /* 应用发布信息 */
         "distribute" : {
@@ -45,14 +51,72 @@
                 ]
             },
             /* ios打包配置 */
-            "ios" : {},
+            "ios" : {
+                "UIUserInterfaceStyle" : "Automatic"
+            },
             /* SDK配置 */
             "sdkConfigs" : {
                 "ad" : {},
                 "speech" : {
                     "ifly" : {}
+                },
+                "push" : {},
+                "share" : {},
+                "maps" : {
+                    "amap" : {
+                        "appkey_ios" : "6b52a403d18d64dae41c7a3e05c99fe0",
+                        "appkey_android" : "287d0bf3b0e436e435747c9f62dc806d"
+                    }
+                },
+                "geolocation" : {}
+            },
+            "splashscreen" : {
+                "androidStyle" : "default",
+                "iosStyle" : "common",
+                "android" : {
+                    "xhdpi" : "unpackage/status/720 × 1242.png",
+                    "hdpi" : "unpackage/status/480 × 762.png",
+                    "xxhdpi" : "unpackage/status/1080 × 1882.png"
+                }
+            },
+            "icons" : {
+                "android" : {
+                    "hdpi" : "unpackage/res/icons/72x72.png",
+                    "xhdpi" : "unpackage/res/icons/96x96.png",
+                    "xxhdpi" : "unpackage/res/icons/144x144.png",
+                    "xxxhdpi" : "unpackage/res/icons/192x192.png"
+                },
+                "ios" : {
+                    "appstore" : "unpackage/res/icons/1024x1024.png",
+                    "ipad" : {
+                        "app" : "unpackage/res/icons/76x76.png",
+                        "app@2x" : "unpackage/res/icons/152x152.png",
+                        "notification" : "unpackage/res/icons/20x20.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "proapp@2x" : "unpackage/res/icons/167x167.png",
+                        "settings" : "unpackage/res/icons/29x29.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "spotlight" : "unpackage/res/icons/40x40.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png"
+                    },
+                    "iphone" : {
+                        "app@2x" : "unpackage/res/icons/120x120.png",
+                        "app@3x" : "unpackage/res/icons/180x180.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "notification@3x" : "unpackage/res/icons/60x60.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "settings@3x" : "unpackage/res/icons/87x87.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png",
+                        "spotlight@3x" : "unpackage/res/icons/120x120.png"
+                    }
                 }
             }
+        },
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : false,
+            "waiting" : false,
+            "delay" : 0,
+            "autoclose" : false
         }
     },
     /* 快应用特有相关 */
@@ -65,7 +129,18 @@
             "postcss" : false,
             "minified" : true
         },
-        "usingComponents" : true
+        "usingComponents" : true,
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "获取您的个人位位置和信息"
+            }
+        },
+        "plugins" : {
+            "chooseLocation" : {
+                "version" : "1.0.3",
+                "provider" : "wx3fb24f5d2f0956d6"
+            }
+        }
     },
     "mp-alipay" : {
         "usingComponents" : true

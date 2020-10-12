@@ -103,10 +103,10 @@
         this.userpront = e.detail.value
       },
       //跳转到用户设备列表
-      userdevicelist(id,name){
-       uni.navigateTo({
-         url: '/pages/userme/userdevicelist?id=' + id + '&name=' + name,
-       });
+      userdevicelist(id, name) {
+        uni.navigateTo({
+          url: '/pages/userme/userdevicelist?id=' + id + '&name=' + name,
+        });
       }
     },
     computed: {},

@@ -37,29 +37,22 @@
     <!-- 设置详细 -->
     <view class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg radius">
       <view class="cu-item arrow">
-        <navigator class="content" hover-class="none" url='/pages/userme/userpolice'>
+        <navigator class="content" hover-class="none" @click="ligoin" url='/pages/userme/userpolice'>
           <text class="cuIcon-moneybagfill text-red"></text>
           <text class="text-grey">报警记录</text>
-          <!-- <text class='num'>19</text> -->
-        </navigator>
-      </view>
-
-      <!-- <view class="cu-item arrow">
-        <navigator class="content" hover-class="none" url='/pages/my/my_sale/my_sale'>
-          <text class="cuIcon-titles text-green"></text>
-          <text class="text-grey">我的设备</text>
         </navigator>
       </view>
       <view class="cu-item arrow">
-        <navigator class="content" hover-class="none" url="/pages/my/my_buy/my_buy">
-          <text class="cuIcon-formfill text-green"></text>
-          <text class="text-grey">用户设备</text>
-        </navigator>
-      </view> -->
-      <view class="cu-item arrow">
-        <navigator class="content" hover-class="none" url="/pages/userme/userlist">
+        <navigator class="content" hover-class="none" @click="ligoin" :url="isurl? '': url">
           <text class="cuIcon-locationfill text-grey"></text>
           <text class="text-grey">用户列表</text>
+        </navigator>
+      </view>
+      <!-- 设置 -->
+      <view class="cu-item arrow">
+        <navigator class="content" hover-class="none" @click="ligoin" url="/pages/userme/setup">
+          <text class="cuIcon-settingsfill text-grey"></text>
+          <text class="text-grey">设置</text>
         </navigator>
       </view>
       <view class="cu-item">
@@ -82,6 +75,8 @@
         username: uni.getStorageSync('islogin').name,
         userdata: [],
         devicetype: '',
+        url: '/pages/userme/userlist',
+        isurl: false,
       }
     },
     methods: {
@@ -109,7 +104,19 @@
         return devicecount <= 0 ? "0" : (Math.round(devicepolice / devicecount * 10000) / 100.00);
       },
       //客服
-      service() {}
+      service() {
+
+      },
+      //处理加载
+      ligoin() {
+        uni.showLoading({
+          title: '加载中'
+        });
+        setTimeout(function() {
+          uni.hideLoading();
+          this.isurl = true;
+        }, 500);
+      },
     },
     created() {
       // 获取信息

@@ -1,4 +1,4 @@
-const baseUrl = 'http://36.148.1.58:81/api/';
+const baseUrl = 'https://iot.zhkjgf.com:81/api/';
 const httpRequest = (opts, data) => {
   let httpDefaultOpts = {
     url: baseUrl + opts.url,

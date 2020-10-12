@@ -1,7 +1,7 @@
 <template name="basics">
   <view style="overflow:scroll;height: auto;">
     <!-- 顶部操作条 -->
-    <view class="cu-bar bg-white cu-bar fixed nav fixed">
+    <view class="cu-bar bg-white cu-bar fixed nav fixed" :style="tophome">
       <!-- 加载 -->
       <view class="action" v-if="isshowLoad">
         <view class="cu-load load-cuIcon" :class="!isLoad?'loading':'over'"></view>
@@ -78,7 +78,7 @@
         </view>
 
         <!-- 设备列表开始 -->
-        <view class="cu-list menu-avatar" style="margin-bottom: 130upx;">
+        <view class="cu-list menu-avatar" :style="isbottom">
           <view class="cu-item" :class="modalName=='move-box-'+ index?'move-cur':''" v-for="(item,index) in deviceList"
             :key="index" @touchstart="ListTouchStart" @touchmove="ListTouchMove" @touchend="ListTouchEnd" :data-target="'move-box-' + index">
             <view class="cu-avatar round lg" :style="item.status_name === '正常' ? icon_device_li_green :  icon_device_li "></view>
@@ -110,7 +110,7 @@
               </view>
             </view>
             <view class="padding-xl">
-              设备标号:{{devicenum}}
+              设备标号:{{cpdevicenum}}
             </view>
             <view class="cu-bar bg-white justify-end">
               <view class="action">
@@ -155,19 +155,24 @@
         devicetype: [], // 设备类型
         deviceList: [], //设备列表
         countdevice: 0,
-        devicenum: '', //复制设备编号
+        cpdevicenum: '', //复制设备编号
         tid: '',
         // 统计图
         cWidth: '',
         cHeight: '',
         pixelRatio: 1,
-        serverData: ''
+        serverData: '',
+        isbottom: 'margin-bottom: 130upx;',
+        tophome: '',
       };
     },
     methods: {
       // ListTouch触摸开始
       ListTouchStart(e) {
-        this.listTouchStart = e.touches[0].pageX - 120
+        //#ifdef APP-PLUS 
+        this.listTouchStart = e.touches[0].pageX;
+        //#endif
+        this.listTouchStart = e.touches[0].pageX -120;
       },
       // ListTouch计算方向
       ListTouchMove(e) {
@@ -208,7 +213,7 @@
       //打开模拟框
       showModal(e) {
         this.modalName = e.currentTarget.dataset.target;
-        this.devicenum = e.currentTarget.dataset.devicenum;
+        this.cpdevicenum = e.currentTarget.dataset.devicenum;
       },
       touchColumn(e) {
         canvaColumn.touchLegend(e);
@@ -292,7 +297,7 @@
                 });
             } else {
               uni.setClipboardData({
-                data: this.devicenum,
+                data: that.cpdevicenum,
                 success: () => {
                   that.hideModal();
                   uni.showToast({
@@ -319,15 +324,12 @@
         })
       },
       islogin() {
-        uni.getStorage({
-          key: 'islogin',
-          success: function(res) {},
-          fail: function(re) {
-            uni.redirectTo({
-              url: '../login/login',
-            });
-          }
-        });
+        var loginis = uni.getStorageSync('islogin');
+        if (loginis === '') {
+          uni.redirectTo({
+            url: '../login/login',
+          });
+        }
       },
       // 分页加载
       adddevivelist() {
@@ -377,6 +379,11 @@
         this.cWidth = uni.upx2px(750);
         this.cHeight = uni.upx2px(500);
         this.getServerData();
+        let platform = uni.getSystemInfoSync().platform;
+        if (platform == 'ios') {
+          this.isbottom = 'margin-bottom: 180upx;';
+          // this.tophome = "margin-top:30upx";
+        }
       },
       //获取设备详情信息
       devicetypes() {
@@ -432,7 +439,7 @@
           height: _self.cHeight * _self.pixelRatio,
           extra: {
             column: {
-              type:'group',
+              type: 'group',
               width: _self.cWidth * _self.pixelRatio * 0.45 / chartData.categories.length
             }
           }
@@ -501,7 +508,7 @@
                   width: 1,
                 },
               },
-              data:res.data.data.policedata
+              data: res.data.data.policedata
             }, {
               name: '报警数量',
               type: 'column',
@@ -534,6 +541,8 @@
       this.devicetypes();
       this.devicelist();
       this.isapp();
+      var info = plus.push.getClientInfo();
+      console.log(JSON.stringify(info));
     },
     onLaunch() {
       console.log("success")

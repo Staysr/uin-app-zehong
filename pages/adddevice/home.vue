@@ -4,7 +4,7 @@
       <block slot="content">添加设备</block>
     </cu-custom>
     <!-- 表单开始 -->
-    <view style="z-index: 9999999999;overflow:scroll;height: 100%;margin-bottom: 140upx;">
+    <view style="z-index: 9999;overflow:scroll;height: 100%;margin-bottom: 140upx;">
       <form @submit="formSubmit">
         <view class="cu-form-group margin-top">
           <view class="title">设备名称</view>
@@ -79,7 +79,7 @@
         </view>
         <button form-type="submit" class="cu-btn bg-grey lg" style="width: 90%;height: 80upx;margin-left: 40upx;margin-top: 20upx;z-index: 999;">提交</button>
       </form>
-      <view class="cu-modal bottom-modal" :class="modalName=='bottomModal'?'show':''">
+      <view v-if="isnpms" class="cu-modal bottom-modal" :class="modalName=='bottomModal'?'show':''">
         <view class="cu-dialog" style="border-radius: 1;height: 92%;">
           <view class="cu-bar bg-white">
             <view class="action text-green">确定</view>
@@ -126,6 +126,7 @@
         gasid: '',
         mapShow: true,
         positionObj: {},
+        isnpms: false,
       };
     },
     methods: {
@@ -208,11 +209,19 @@
         this.textareaBValue = e.detail.value
       },
       showModal(e) {
-        this.modalName = e.currentTarget.dataset.target
+        if (uni.getSystemInfoSync().platform === 'android') {
+          uni.navigateTo({
+            url: '../adddevice/latitude'
+          });
+        } else {
+          this.modalName = e.currentTarget.dataset.target;
+          this.isnpms = true;
+        }
       },
       //点击组件的触发这个方法
       hideModal(e) {
-        this.modalName = null
+        this.modalName = null;
+        this.isnpms = false;
       },
       larces(e) {
         console.log(e);
@@ -260,7 +269,6 @@
       },
       //验证用户提交表单内容
       isdatadevice(data) {
-        console.log(data);
         if (data.devicecoord === '') {
           this.onshowToast('设备坐标不能为空');
         } else if (data.deviceinfo === '') {
@@ -305,6 +313,7 @@
       this.issetinfo();
       this.devicetypes();
       this.addUserDevices();
+      plus.screen.lockOrientation('portrait-primary');
     },
   }
 </script>

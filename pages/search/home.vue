@@ -16,19 +16,19 @@
       <view class="search-form round">
         <text class="cuIcon-search"></text>
         <text class="cuIcon-close" v-if="cuIconde" style="position: absolute;left:500upx;z-index: 99999;" @click="nonecuIconde"></text>
-        <input @focus="InputFocus" :value="searchdata" @blur="InputBlur" @input="devicedata" :adjust-position="false" type="text"
-          :placeholder="devicedatasetshow === '' ? '搜索设备号、名称 ' : devicedatasetshow " confirm-type="search"></input>
+        <input @focus="InputFocus" :value="searchdata" @blur="InputBlur" @input="devicedata" :adjust-position="false"
+          type="text" :placeholder="devicedatasetshow === '' ? '搜索设备号、名称 ' : devicedatasetshow " confirm-type="search"></input>
       </view>
       <!-- 搜索设备号、名称 -->
       <view class="action">
         <button class="cu-btn bg-green shadow-blur round" @click="postseachdata">搜索</button>
       </view>
     </view>
-    <view class="cu-list menu-avatar" style="margin-top: 12upx;margin-bottom: 120upx;">
+    <view class="cu-list menu-avatar" style="margin-top: 12upx;" :style="bottom">
       <view class="cu-item" v-for="(item,index) in seardevicedata" :key="index" @click="devicceinfo(item.id)">
         <view class="cu-avatar round lg" :style="item.status_name === '正常' ? icon_device_li_green :  icon_device_li "></view>
         <view class="content">
-          <view class="text-grey">{{item.usernickname}}</view>
+          <view class="text-grey">{{item.username}}</view>
           <view class="text-gray text-sm">设备编号:{{item.devicenum}}</view>
         </view>
         <view class="action" :style="item.status_name.length === 5 ? 'margin-right:60upx;' : (item.status_name.length === 4 ? 'margin-right:30upx;' : '')"
@@ -59,6 +59,7 @@
         showdevicedata: '',
         icon_device_li_green: 'background-image: url(../../static/img/icon_device_li_green.png)',
         icon_device_li: 'background-image:url(../../static/img/icon_device_li.png)',
+        bottom: 'margin-bottom:120upx',
       };
     },
     methods: {
@@ -119,6 +120,18 @@
               uni.setStorageSync('setseachdata', this.setsearchdata);
             }
           }
+        }
+      },
+      //判断是否安卓或者ios
+      judgePlatForm() {
+        let platform = uni.getSystemInfoSync().platform;
+        console.log(platform);
+        if (platform == 'ios') {
+          this.bottom = 'margin-bottom:180upx';
+        } else {
+         // #ifdef MP
+          this.bottom = 'margin-bottom:180upx';
+         // #endIf
         }
       },
       //获取缓存搜索
@@ -225,6 +238,7 @@
     created() {
       this.seardevicedata = [];
       this.chatshowsetdevice();
+      this.judgePlatForm();
       if (uni.getStorageSync('setseachdata').length > 0) {
         this.shownoew();
       }

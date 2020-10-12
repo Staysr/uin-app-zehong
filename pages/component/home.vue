@@ -14,11 +14,11 @@
         {{item.name}}
       </view>
     </scroll-view>
-    <view class="cu-list menu-avatar" style="margin-top: 12upx;margin-bottom: 120upx;">
+    <view class="cu-list menu-avatar" style="margin-top: 12upx;" :style="bottom">
       <view class="cu-item" v-for="(item,index) in devicelist" :key="index" @click="devicceinfo(item.id)">
         <view class="cu-avatar round lg" :style="item.status_name === '正常' ? icon_device_li_green :  icon_device_li "></view>
         <view class="content">
-          <view class="text-grey">{{item.usernickname}}</view>
+          <view class="text-grey">{{item.username}}</view>
           <view class="text-gray text-sm">设备编号:{{item.devicenum}}</view>
         </view>
         <view class="action" :style="item.status_name.length === 5 ? 'margin-right:60upx;' : (item.status_name.length === 4 ? 'margin-right:30upx;' : '')"
@@ -26,10 +26,10 @@
           <view :class="item.status_name === '正常'? 'cu-tag bg-green' : 'cu-tag bg-red' ">{{item.status_name}}</view>
         </view>
       </view>
-      <view class="loadingjiazai" v-if="loadingjiazai || count > 10">
-        <view class="cu-load bg-grey" v-if="overs" :class="!isLoad?'loading':'over'"></view>
-        <view class="cu-load bg-grey" v-if="isover" @click="adddevivelist">点击加载</view>
-      </view>
+        <view class="loadingjiazai" v-if="loadingjiazai || count > 10">
+          <view class="cu-load bg-grey" style="border-radius: 35upx;" v-if="overs" :class="!isLoad?'loading':'over'"></view>
+          <view class="cu-load bg-grey" style="border-radius: 35upx;" v-if="isover" @click="adddevivelist">点击加载<text v-if="isloading" class="cuIcon-loading2 cuIconfont-spin"></text></view>
+        </view>
     </view>
   </view>
   </view>
@@ -60,6 +60,8 @@
         overs: false,
         type: '',
         isLoad: false,
+        bottom: 'margin-bottom:120upx',
+        isloading: false,
       };
     },
     methods: {
@@ -95,6 +97,9 @@
       },
       //跳转设备详情
       devicceinfo(id) {
+        uni.showLoading({
+          title: '加载中...'
+        });
         let opts = {
           url: 'huinapphome/devicedatainfo/' + id,
           method: 'get'
@@ -104,6 +109,7 @@
             uni.navigateTo({
               url: '/pages/basics/deviceinfo?data=' + JSON.stringify(res.data.data),
             });
+            uni.hideLoading();
           }
         }, error => {
           console.log(error);
@@ -120,6 +126,7 @@
           url: 'devices/control',
           method: 'get'
         };
+        this.isloading = true;
         http.httpRequest(opts, data).then(res => {
           var isLoadding = res.data.data.devicelist.length >= 1 ? true : false;
           let arr = res.data.data.devicelist
@@ -134,6 +141,7 @@
             this.overs = true;
             this.isLoad = true;
           }
+          this.isloading = false;
         }, error => {
           console.log(error);
         })
@@ -147,9 +155,14 @@
 
 <style>
   .loadingjiazai {
-    margin-top: 20rpx;
+    /* margin-top: 20rpx;
     filter: alpha(Opacity=60);
     -moz-opacity: 0.6;
-    opacity: 0.6;
+    opacity: 0.6; */
+    width: 30%;
+    position:fixed;
+    z-index: 99999;
+    bottom: 200upx;
+    right: 12upx;
   }
 </style>
