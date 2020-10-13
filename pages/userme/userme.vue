@@ -38,13 +38,13 @@
     <view class="cu-list menu card-menu margin-top-xl margin-bottom-xl shadow-lg radius">
       <view class="cu-item arrow">
         <navigator class="content" hover-class="none" @click="ligoin" url='/pages/userme/userpolice'>
-          <text class="cuIcon-moneybagfill text-red"></text>
+          <text class="cuIcon-notice text-red"></text>
           <text class="text-grey">报警记录</text>
         </navigator>
       </view>
       <view class="cu-item arrow">
         <navigator class="content" hover-class="none" @click="ligoin" :url="isurl? '': url">
-          <text class="cuIcon-locationfill text-grey"></text>
+          <text class="cuIcon-sort text-grey"></text>
           <text class="text-grey">用户列表</text>
         </navigator>
       </view>

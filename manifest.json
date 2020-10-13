@@ -74,9 +74,9 @@
                 "androidStyle" : "default",
                 "iosStyle" : "common",
                 "android" : {
-                    "xhdpi" : "unpackage/status/720 × 1242.png",
-                    "hdpi" : "unpackage/status/480 × 762.png",
-                    "xxhdpi" : "unpackage/status/1080 × 1882.png"
+                    "xhdpi" : "unpackage/status/泽宏启动页/728.1242.png",
+                    "hdpi" : "unpackage/status/泽宏启动页/480.762.png",
+                    "xxhdpi" : "unpackage/status/泽宏启动页/1080.1882.png"
                 }
             },
             "icons" : {

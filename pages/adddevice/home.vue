@@ -182,23 +182,36 @@
           devicemonad: this.danweiid,
           uid: this.addUserDeviceid,
         }
-        if (this.isdatadevice(data)) {
-          let opts = {
-            url: 'devices/adddevice',
-            method: 'post'
-          };
-          http.httpRequest(opts, data).then(res => {
-            console.log(res);
-            if (res.data.code === 200) {
-              uni.removeStorageSync('longitislongir');
-              uni.navigateTo({
-                url: '/pages/main/main',
+        uni.showLoading({
+          title: '加载中'
+        });
+        // if (this.isdatadevice(data)) {
+        let opts = {
+          url: 'devices/adddevice',
+          method: 'post'
+        };
+        http.httpRequest(opts, data).then(res => {
+          if (res.data.code === 200) {
+            uni.hideLoading();
+            uni.removeStorageSync('longitislongir');
+            uni.navigateTo({
+              url: '/pages/main/main',
+            });
+          } else {
+            uni.hideLoading();
+            if (uni.getSystemInfoSync().platform == "Android" || uni.getSystemInfoSync().platform == "iOS") {
+              plus.nativeUI.toast(this.errorsshow(res.data.errors));
+            } else {
+              uni.showToast({
+                title: this.errorsshow(res.data.errors),
+                duration: 2000
               });
             }
-          }, error => {
-            console.log(error);
-          })
-        }
+          }
+        }, error => {
+          console.log(error);
+        })
+        // }
       },
       // 更新地址并关闭地图
       updateAddress(addressObj) {
@@ -301,19 +314,45 @@
           return true;
         }
       },
+      errorsshow(value) {
+        if ('devicecoord' in value) {
+          return value["devicecoord"][0];
+        } else if ('deviceinfo' in value) {
+          return value["deviceinfo"][0];
+        } else if ('devicelinkman' in value) {
+          return value["devicelinkman"][0];
+        } else if ('devicemonad' in value) {
+          return value["devicemonad"][0];
+        } else if ('devicenum' in value) {
+          return value["devicenum"][0];
+        } else if ('devicephone' in value) {
+          return value["devicephone"][0];
+        } else if ('deviceremark' in value) {
+          return value["deviceremark"][0];
+        } else if ('dtype' in value) {
+          return value["dtype"][0];
+        } else if ('status' in value) {
+          return value["status"][0];
+        } else if ('username' in value) {
+          return value["username"][0];
+        }
+      },
       //显示提示信息
       onshowToast(data) {
         uni.showToast({
           title: data,
           duration: 2000
         });
-      }
+      },
+      //将手机竖屏回来
+      starye(){
+        plus.screen.lockOrientation('portrait-primary');
+      },
     },
     created() {
       this.issetinfo();
       this.devicetypes();
       this.addUserDevices();
-      plus.screen.lockOrientation('portrait-primary');
     },
   }
 </script>

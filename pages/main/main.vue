@@ -8,7 +8,7 @@
     <view class="cu-bar tabbar bg-black shadow foot">
       <view :class="PageCur=='basics'?'action text-green':'action text-gray'" @click="NavChange" data-cur="basics">
         <view class="cuIcon-homefill"></view> 首页
-      </view>  
+      </view>
       <view :class="PageCur=='component'?'action text-green':'action text-gray'" @click="NavChange" data-cur="component">
         <view class="cuIcon-similar"></view> 设备状态
       </view>
@@ -39,7 +39,22 @@
     },
     methods: {
       NavChange: function(e) {
-        this.PageCur = e.currentTarget.dataset.cur
+        this.iswifi(e);
+      },
+      //监测网络状态
+      iswifi(e) {
+        let that = this;
+        uni.getNetworkType({
+          success: function(res) {
+            if (res.networkType === "none") {
+              uni.navigateTo({
+                url: '../wifiisin/home'
+              });
+            } else {
+              that.PageCur = e.currentTarget.dataset.cur;
+            }
+          }
+        });
       }
     }
   }

@@ -41,6 +41,11 @@
         "navigationBarTitleText": "经纬度"
       }
     }, {
+      "path": "pages/wifiisin/home",
+      "style": {
+        "navigationBarTitleText": "无网络状态"
+      }
+    }, {
       "path": "pages/adddevice/mpnaddlink",
       "style": {}
     }

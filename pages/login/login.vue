@@ -318,13 +318,28 @@
         this.infutvalue = ''; //使用input为空
         this.iscode = false;
         this.reset = false;
+      },
+      //监测网络状态
+      ifwifi() {
+        let that = this;
+        uni.getNetworkType({
+          success: function(res) {
+            if (res.networkType === "none") {
+              uni.navigateTo({
+                url: '../wifiisin/home'
+              });
+            }else{
+              // 监测登入
+              that.showislogin();
+            }
+          }
+        });
       }
     },
     mounted() {},
     onLoad() {
       let that = this;
-      // 监测登入
-      that.showislogin();
+      that.ifwifi();
     }
   }
 </script>
